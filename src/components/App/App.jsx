@@ -4,6 +4,7 @@ import React, { Component }  from "react";
 import { AppEl } from "./App.styled";
 import { SearchBar } from "components/Searchbar/Searchbar";
 import { Loader } from "components/Loader/Loader";
+import { ErrorMessage } from "components/Error/Error";
 import { Gallery } from "components/ImageGallery/ImageGallery";
 import { LoadMore } from "components/Button/Button";
 import * as API from "../../services/Api"
@@ -64,14 +65,10 @@ export class App extends Component {
   render() {
     const { searchData, loading, error, showLoadMore } = this.state;
     return (
-      <AppEl
-        style={{
-          height: '100vh',
-        }}
-      >
+      <AppEl>
 
         <SearchBar onSubmit={this.handleSearch}/>
-        {error && <p>{error}</p>}
+        {error && <ErrorMessage error={error} />}
         {searchData.length > 0 && <Gallery data={searchData} isSubmitting={loading}/>}
         {loading && <Loader />}
         {showLoadMore && <LoadMore onLoadMore={this.handleLoadMore}/>}
