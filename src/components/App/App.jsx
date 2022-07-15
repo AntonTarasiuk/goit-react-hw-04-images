@@ -20,17 +20,12 @@ export class App extends Component {
   }
 
   async componentDidUpdate(_, prevState) {
-    
-    // console.log(prevState.page)
-    // console.log(this.state.page)
-    // console.log(prevState.searchData.length)
-    // console.log(this.state.searchData.length)
     if (this.state.searchValue === prevState.searchValue && this.state.page !== prevState.page) {
       this.setState({ loading: true })
       await this.fetchPicture()
     }
     if (this.state.searchValue !== prevState.searchValue) {
-      this.setState({ searchData: [], loading: true, page: 1 });
+      this.setState({ searchData: [], loading: true });
       await this.fetchPicture()
     }    
   }

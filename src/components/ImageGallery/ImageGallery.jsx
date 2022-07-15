@@ -6,11 +6,9 @@ export const Gallery = ({data}) => {
     return (
         <ImageGallery>
             {
-                data && data.map(({ id, webformatURL, largeImageURL }) => 
-                // console.log(webformatURL)) 
+                data && data.map(({ id, webformatURL, largeImageURL }) =>
                 <GalleryItem key={id} id={id} image={webformatURL} modalImg={largeImageURL} />)
             }
-            {/* // <!-- Набор <li> с изображениями --> */}
         </ImageGallery>
     )
 }

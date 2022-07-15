@@ -13,6 +13,5 @@ export const PictureDataFetch = async (searchValue, page) => {
         orientation: 'horizontal',
         per_page: 12,
     }})
-    console.log(respons.data.hits)
     return respons.data
 }

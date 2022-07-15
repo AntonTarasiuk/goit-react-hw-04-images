@@ -1,7 +1,8 @@
-// import { render } from "@testing-library/react";
 import React, { Component } from "react";
+import { createPortal } from "react-dom";
 import { Overlay, Modal, CloseModalBtn, CloseModalIcon } from "./Modal.styled";
-// import * as basicLightbox from 'basiclightbox'
+
+const modalRoot = document.querySelector('#modal-root')
 
 export class ModalWindow extends Component {
     componentDidMount() {
@@ -26,7 +27,7 @@ export class ModalWindow extends Component {
 
     render() {
         const {imgUrl, onCloseModal} = this.props
-        return (
+        return createPortal(
             <Overlay onClick={this.handleBackdropClick}>
                 <Modal>
                     <img src={imgUrl} alt="Modal pics"/>
@@ -34,7 +35,8 @@ export class ModalWindow extends Component {
                 <CloseModalBtn type="button" onClick={onCloseModal}>
                     <CloseModalIcon />
                 </CloseModalBtn>
-            </Overlay>
+            </Overlay>,
+            modalRoot,
         )
     }
 }
