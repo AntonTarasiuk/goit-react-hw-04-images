@@ -50,7 +50,7 @@ export class App extends Component {
   }
 
   handleSearch = async (searchValue) => {
-    this.setState({ searchValue })
+    this.setState({ searchValue, page: 1 })
   }
 
   handleLoadMore = () => {
