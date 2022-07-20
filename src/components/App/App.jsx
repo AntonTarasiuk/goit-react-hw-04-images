@@ -1,73 +1,74 @@
-import React, { Component }  from "react";
+import { useState, useEffect }  from "react";
+import { ToastContainer, toast } from 'react-toastify';
+  import 'react-toastify/dist/ReactToastify.css';
 // import axios from 'axios';
 
 import { AppEl } from "./App.styled";
 import { SearchBar } from "components/Searchbar/Searchbar";
 import { Loader } from "components/Loader/Loader";
-import { ErrorMessage } from "components/Error/Error";
+// import { ErrorMessage } from "components/Error/Error";
 import { Gallery } from "components/ImageGallery/ImageGallery";
 import { LoadMore } from "components/Button/Button";
-import * as API from "../../services/Api"
+import * as API from "../../services/Api";
 
-export class App extends Component {
-  state = {
-    searchValue: '',
-    searchData: [],
-    loading: false,
-    page: 1,
-    error: null,
-    showLoadMore: false,
-  }
+export const App = () => {
+  const [searchValue, setSearchValue] = useState('');
+  const [searchData, setSearchData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(1);
+  const [perPage] = useState(12);
+  const [error, setError] = useState(null);
+  const [showLoadMore, setShowLoadMore] = useState(false);
 
-  async componentDidUpdate(_, prevState) {
-    if (this.state.searchValue === prevState.searchValue && this.state.page !== prevState.page) {
-      this.setState({ loading: true })
-      await this.fetchPicture()
+  useEffect(() => {
+    if (searchValue.trim() === '') {
+      return
     }
-    if (this.state.searchValue !== prevState.searchValue) {
-      this.setState({ searchData: [], loading: true });
-      await this.fetchPicture()
-    }    
+    setLoading(true);
+    setShowLoadMore(false);
+    API.PictureDataFetch(searchValue, page)
+      .then(picture => {
+          if ((picture.totalHits - perPage * (page - 1)) > perPage) {
+            setShowLoadMore(true);
+          } else {
+            setShowLoadMore(false);
+          }
+          setLoading(false);
+          if (page === 1) {
+            setSearchData([...picture.hits]);
+          } else {
+            setSearchData(prevData => [...prevData, ...picture.hits]);
+          }
+      })
+      .catch(error => {
+        setError(error);
+        setLoading(false);       
+          toast.error("Щось пішло не так !", {
+            position: toast.POSITION.TOP_RIGHT,
+            autoClose: 3000,
+            theme: "dark",
+          });
+      })
+  }, [searchValue, page, perPage])
+
+  const handleSearch = async (query) => {
+    setSearchData([]);
+    setSearchValue(query);
+    setPage(1);
   }
 
-  fetchPicture = async () => {
-    try {
-      const picture = await API.PictureDataFetch(this.state.searchValue, this.state.page)
-      if ((picture.totalHits - this.state.searchData.length) > picture.hits.length) {
-        this.setState({showLoadMore: true})
-      } else {
-        this.setState({showLoadMore: false})
-      }
-      this.setState(state => ({
-        searchData: [...state.searchData, ...picture.hits],
-        loading: false,
-      }))
-    } catch (error) {
-      console.log(error)
-      const message = "Щось пішло не так";
-      this.setState({loading: false, error: message})
-    }
+  const handleLoadMore = () => {
+    setPage(p => p + 1)
   }
 
-  handleSearch = async (searchValue) => {
-    this.setState({ searchValue, page: 1 })
-  }
+  return (
+    <AppEl>
 
-  handleLoadMore = () => {
-    this.setState(prevState => ({page: prevState.page + 1}))
-  }
-
-  render() {
-    const { searchData, loading, error, showLoadMore } = this.state;
-    return (
-      <AppEl>
-
-        <SearchBar onSubmit={this.handleSearch}/>
-        {error && <ErrorMessage error={error} />}
-        {searchData.length > 0 && <Gallery data={searchData} isSubmitting={loading}/>}
-        {loading && <Loader />}
-        {showLoadMore && <LoadMore onLoadMore={this.handleLoadMore}/>}
-      </AppEl>
-    );
-  }
+      <SearchBar onSubmit={handleSearch}/>
+      {error && <ToastContainer />}
+      {searchData.length > 0 && <Gallery data={searchData} isSubmitting={loading}/>}
+      {loading && <Loader />}
+      {showLoadMore && <LoadMore onLoadMore={handleLoadMore}/>}
+    </AppEl>
+  );
 };

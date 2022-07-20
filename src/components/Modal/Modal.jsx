@@ -1,45 +1,37 @@
-import React, { Component } from "react";
+import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import { Overlay, Modal, CloseModalBtn, CloseModalIcon } from "./Modal.styled";
 
 const modalRoot = document.querySelector('#modal-root')
 
-export class ModalWindow extends Component {
-    componentDidMount() {
-        window.addEventListener('keydown', this.handelKeyDown)
-    }
+export const ModalWindow = ({imgUrl, onCloseModal}) => {
+    useEffect(() => {
+        window.addEventListener('keydown', handelKeyDown);
+        return () => window.removeEventListener('keydown', handelKeyDown)
+    }, [])
 
-    componentWillUnmount() {
-        window.removeEventListener('keydown', this.handelKeyDown)
-    }
-
-    handelKeyDown = e => {
+    const handelKeyDown = e => {
         if (e.code === 'Escape') {
-            this.props.onCloseModal();
+            console.log(e.code)
+            onCloseModal();
         }
     }
 
-    handleBackdropClick = (event) => {
+    const handleBackdropClick = (event) => {
         if (event.target === event.currentTarget) {
-            this.props.onCloseModal();
+            onCloseModal();
         }
     }
 
-    render() {
-        const {imgUrl, onCloseModal} = this.props
-        return createPortal(
-            <Overlay onClick={this.handleBackdropClick}>
-                <Modal>
-                    <img src={imgUrl} alt="Modal pics"/>
-                </Modal>
-                <CloseModalBtn type="button" onClick={onCloseModal}>
-                    <CloseModalIcon />
-                </CloseModalBtn>
-            </Overlay>,
-            modalRoot,
-        )
-    }
+    return createPortal(
+        <Overlay onClick={handleBackdropClick}>
+            <Modal>
+                <img src={imgUrl} alt="Modal pics"/>
+            </Modal>
+            <CloseModalBtn type="button" onClick={onCloseModal}>
+                <CloseModalIcon />
+            </CloseModalBtn>
+        </Overlay>,
+        modalRoot,
+    )
 }
-// const instance = basicLightbox.create(`
-//     <img src="assets/images/image.png" width="800" height="600">
-// `)

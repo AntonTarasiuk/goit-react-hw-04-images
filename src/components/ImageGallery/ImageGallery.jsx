@@ -2,7 +2,6 @@ import { GalleryItem } from "components/ImageGalleryItem/ImageGalleryItem";
 import { ImageGallery } from "./ImageGallery.styled";
 
 export const Gallery = ({data}) => {
-    // console.log(data)
     return (
         <ImageGallery>
             {
